@@ -1,7 +1,7 @@
-from flask_sqlalchemy import SQLAlchemy # type: ignore
-from sqlalchemy import MetaData # type: ignore
-from sqlalchemy.ext.associationproxy import association_proxy # type: ignore
-from sqlalchemy_serializer import SerializerMixin # type: ignore
+from flask_sqlalchemy import SQLAlchemy  # type: ignore
+from sqlalchemy import MetaData  # type: ignore
+from sqlalchemy.ext.associationproxy import association_proxy  # type: ignore
+from sqlalchemy_serializer import SerializerMixin  # type: ignore
 
 metadata = MetaData(naming_convention={
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
