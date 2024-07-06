@@ -1,3 +1,4 @@
+# models.py
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
 from sqlalchemy import MetaData  # type: ignore
 from sqlalchemy.ext.associationproxy import association_proxy  # type: ignore
@@ -15,7 +16,6 @@ class Customer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
 
-    # Define the relationship to Review
     reviews = db.relationship('Review', back_populates='customer')
 
     def __repr__(self):
@@ -28,7 +28,6 @@ class Item(db.Model):
     name = db.Column(db.String)
     price = db.Column(db.Float)
 
-    # Define the relationship to Review
     reviews = db.relationship('Review', back_populates='item')
 
     def __repr__(self):
@@ -42,9 +41,25 @@ class Review(db.Model):
     customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
 
-    # Relationships
     customer = db.relationship('Customer', back_populates='reviews')
     item = db.relationship('Item', back_populates='reviews')
 
     def __repr__(self):
         return f'<Review {self.id}, {self.comment}, Customer {self.customer_id}, Item {self.item_id}>'
+
+class Message(db.Model, SerializerMixin):
+    __tablename__ = 'messages'
+
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.String)
+    username = db.Column(db.String)
+
+    def __repr__(self):
+        return f'<Message {self.id}, {self.body}, {self.username}>'
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'body': self.body,
+            'username': self.username
+        }
