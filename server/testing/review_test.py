@@ -1,4 +1,3 @@
-# testing/review_test.py
 import pytest
 from app import create_app
 from models import db, Customer, Item, Review
@@ -20,24 +19,25 @@ def test_client():
     ctx.pop()
 
 @pytest.fixture(scope='module')
-def init_database():
-    # Create the database and the database table
-    db.create_all()
+def init_database(test_client):
+    with test_client.application.app_context():
+        # Create the database and the database table
+        db.create_all()
 
-    # Insert customer data
-    customer1 = Customer(name='John Doe')
-    db.session.add(customer1)
+        # Insert customer data
+        customer1 = Customer(name='John Doe')
+        db.session.add(customer1)
 
-    # Insert item data
-    item1 = Item(name='Sample Item', price=19.99)
-    db.session.add(item1)
+        # Insert item data
+        item1 = Item(name='Sample Item', price=19.99)
+        db.session.add(item1)
 
-    # Commit the changes for the customer and item
-    db.session.commit()
+        # Commit the changes for the customer and item
+        db.session.commit()
 
-    yield db  # this is where the testing happens!
+        yield db  # this is where the testing happens!
 
-    db.drop_all()
+        db.drop_all()
 
 def test_can_be_instantiated():
     '''Review model in models.py'''
@@ -54,7 +54,9 @@ def test_can_be_saved_to_database(test_client, init_database):
     '''can be added to a transaction and committed to review table with comment column.'''
     with test_client.application.app_context():
         assert 'comment' in Review.__table__.columns
-        r = Review(comment='great!')
+        customer = Customer.query.first()
+        item = Item.query.first()
+        r = Review(comment='great!', customer_id=customer.id, item_id=item.id)
         db.session.add(r)
         db.session.commit()
 

@@ -1,4 +1,3 @@
-# models.py
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
 from sqlalchemy import MetaData  # type: ignore
 from sqlalchemy.ext.associationproxy import association_proxy  # type: ignore
@@ -16,7 +15,7 @@ class Customer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
 
-    reviews = db.relationship('Review', back_populates='customer')
+    reviews = db.relationship('Review', back_populates='customer')  # Relationship with Review
 
     def __repr__(self):
         return f'<Customer {self.id}, {self.name}>'
@@ -28,7 +27,7 @@ class Item(db.Model):
     name = db.Column(db.String)
     price = db.Column(db.Float)
 
-    reviews = db.relationship('Review', back_populates='item')
+    reviews = db.relationship('Review', back_populates='item')  # Relationship with Review
 
     def __repr__(self):
         return f'<Item {self.id}, {self.name}, {self.price}>'
