@@ -1,12 +1,10 @@
-from app import app, db
+from app import create_app, db
 from server.models import Customer, Item, Review
 
 
 class TestAssociationProxy:
-    '''Customer in models.py'''
-
     def test_has_association_proxy(self):
-        '''has association proxy to items'''
+        app = create_app()
         with app.app_context():
             c = Customer()
             i = Item()

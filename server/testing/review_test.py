@@ -1,4 +1,4 @@
-import pytest # type: ignore
+import pytest
 from app import create_app
 from models import db, Customer, Item, Review
 
@@ -18,11 +18,9 @@ def init_database(test_client):
     with test_client.application.app_context():
         db.create_all()
 
-        # Insert customer data
         customer1 = Customer(name='John Doe')
         db.session.add(customer1)
 
-        # Insert item data
         item1 = Item(name='Sample Item', price=19.99)
         db.session.add(item1)
 
