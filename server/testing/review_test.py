@@ -1,4 +1,4 @@
-import pytest # type: ignore
+import pytest
 from app import create_app
 from models import db, Customer, Item, Review
 
@@ -9,7 +9,13 @@ def test_client():
     ctx = flask_app.app_context()
     ctx.push()
 
+    with flask_app.app_context():
+        db.create_all()
+
     yield testing_client
+
+    with flask_app.app_context():
+        db.drop_all()
 
     ctx.pop()
 

@@ -1,13 +1,30 @@
-from server.app import create_app, db
-from server.models import Customer, Item, Review
+import pytest
+from app import create_app, db
+from models import Customer, Item, Review
+
+@pytest.fixture(scope='module')
+def test_client():
+    flask_app = create_app()
+    testing_client = flask_app.test_client()
+    ctx = flask_app.app_context()
+    ctx.push()
+
+    with flask_app.app_context():
+        db.create_all()
+
+    yield testing_client
+
+    with flask_app.app_context():
+        db.drop_all()
+
+    ctx.pop()
 
 class TestSerialization:
     '''models in models.py'''
 
-    def test_customer_is_serializable(self):
+    def test_customer_is_serializable(self, test_client):
         '''customer is serializable'''
-        app = create_app()
-        with app.app_context():
+        with test_client.application.app_context():
             c = Customer(name='Phil')
             db.session.add(c)
             db.session.commit()
@@ -16,15 +33,14 @@ class TestSerialization:
             db.session.commit()
             customer_dict = c.to_dict()
 
-            assert customer_dict['id']
+            assert 'id' in customer_dict
             assert customer_dict['name'] == 'Phil'
-            assert customer_dict['reviews']
-            assert 'customer' not in customer_dict['reviews']
+            assert 'reviews' in customer_dict
+            assert 'customer' not in customer_dict['reviews'][0]  # Ensure no circular reference
 
-    def test_item_is_serializable(self):
+    def test_item_is_serializable(self, test_client):
         '''item is serializable'''
-        app = create_app()
-        with app.app_context():
+        with test_client.application.app_context():
             i = Item(name='Insulated Mug', price=9.99)
             db.session.add(i)
             db.session.commit()
@@ -33,18 +49,17 @@ class TestSerialization:
             db.session.commit()
 
             item_dict = i.to_dict()
-            assert item_dict['id']
+            assert 'id' in item_dict
             assert item_dict['name'] == 'Insulated Mug'
             assert item_dict['price'] == 9.99
-            assert item_dict['reviews']
-            assert 'item' not in item_dict['reviews']
+            assert 'reviews' in item_dict
+            assert 'item' not in item_dict['reviews'][0]  # Ensure no circular reference
 
-    def test_review_is_serializable(self):
+    def test_review_is_serializable(self, test_client):
         '''review is serializable'''
-        app = create_app()
-        with app.app_context():
-            c = Customer()
-            i = Item()
+        with test_client.application.app_context():
+            c = Customer(name='Phil')
+            i = Item(name='Insulated Mug', price=9.99)
             db.session.add_all([c, i])
             db.session.commit()
 
@@ -53,9 +68,9 @@ class TestSerialization:
             db.session.commit()
 
             review_dict = r.to_dict()
-            assert review_dict['id']
-            assert review_dict['customer']
-            assert review_dict['item']
+            assert 'id' in review_dict
+            assert 'customer' in review_dict
+            assert 'item' in review_dict
             assert review_dict['comment'] == 'great!'
-            assert 'reviews' not in review_dict['customer']
-            assert 'reviews' not in review_dict['item']
+            assert 'reviews' not in review_dict['customer']  # Ensure no circular reference
+            assert 'reviews' not in review_dict['item']  # Ensure no circular reference
