@@ -28,10 +28,16 @@ class TestSerialization:
             c = Customer(name='Phil')
             db.session.add(c)
             db.session.commit()
-            r = Review(comment='great!', customer=c)
+            i = Item(name='Insulated Mug', price=9.99)
+            db.session.add(i)
+            db.session.commit()
+            r = Review(comment='great!', customer=c, item=i)
             db.session.add(r)
             db.session.commit()
             customer_dict = c.to_dict()
+
+            # Debugging: print the serialized customer
+            print("Serialized Customer:", customer_dict)
 
             assert 'id' in customer_dict
             assert customer_dict['name'] == 'Phil'
@@ -44,11 +50,18 @@ class TestSerialization:
             i = Item(name='Insulated Mug', price=9.99)
             db.session.add(i)
             db.session.commit()
-            r = Review(comment='great!', item=i)
+            c = Customer(name='Phil')
+            db.session.add(c)
+            db.session.commit()
+            r = Review(comment='great!', customer=c, item=i)
             db.session.add(r)
             db.session.commit()
 
             item_dict = i.to_dict()
+
+            # Debugging: print the serialized item
+            print("Serialized Item:", item_dict)
+
             assert 'id' in item_dict
             assert item_dict['name'] == 'Insulated Mug'
             assert item_dict['price'] == 9.99
@@ -68,6 +81,10 @@ class TestSerialization:
             db.session.commit()
 
             review_dict = r.to_dict()
+
+            # Debugging: print the serialized review
+            print("Serialized Review:", review_dict)
+
             assert 'id' in review_dict
             assert 'customer' in review_dict
             assert 'item' in review_dict
