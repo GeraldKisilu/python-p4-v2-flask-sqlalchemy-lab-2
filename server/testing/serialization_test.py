@@ -1,4 +1,4 @@
-import pytest
+import pytest # type: ignore
 from app import create_app, db
 from models import Customer, Item, Review
 
