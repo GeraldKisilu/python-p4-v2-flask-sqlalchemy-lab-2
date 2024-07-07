@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
-from flask_migrate import Migrate
-from flask_cors import CORS
+from flask_migrate import Migrate # type: ignore
+from flask_cors import CORS # type: ignore
 from models import db, Customer, Item, Message, Review
 
 def create_app():

@@ -1,12 +1,9 @@
-from app import app, db
+from server.app import create_app, db  # Adjust the import path as per your project structure
 from server.models import Customer, Item, Review
 
-
 class TestSerialization:
-    '''models in models.py'''
-
     def test_customer_is_serializable(self):
-        '''customer is serializable'''
+        app = create_app()
         with app.app_context():
             c = Customer(name='Phil')
             db.session.add(c)
@@ -22,7 +19,7 @@ class TestSerialization:
             assert 'customer' not in customer_dict['reviews']
 
     def test_item_is_serializable(self):
-        '''item is serializable'''
+        app = create_app()
         with app.app_context():
             i = Item(name='Insulated Mug', price=9.99)
             db.session.add(i)
@@ -39,7 +36,7 @@ class TestSerialization:
             assert 'item' not in item_dict['reviews']
 
     def test_review_is_serializable(self):
-        '''review is serializable'''
+        app = create_app()
         with app.app_context():
             c = Customer()
             i = Item()
@@ -57,3 +54,4 @@ class TestSerialization:
             assert review_dict['comment'] == 'great!'
             assert 'reviews' not in review_dict['customer']
             assert 'reviews' not in review_dict['item']
+
