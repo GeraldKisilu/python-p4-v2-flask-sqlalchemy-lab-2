@@ -3,23 +3,28 @@ from sqlalchemy import MetaData  # type: ignore
 from sqlalchemy.ext.associationproxy import association_proxy  # type: ignore
 from sqlalchemy_serializer import SerializerMixin  # type: ignore
 
+# Define a naming convention for foreign keys
 metadata = MetaData(naming_convention={
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
 })
 
+# Initialize the SQLAlchemy object with the custom metadata
 db = SQLAlchemy(metadata=metadata)
 
+# Define the Customer model
 class Customer(db.Model):
     __tablename__ = 'customers'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
 
-    reviews = db.relationship('Review', back_populates='customer')  # Relationship with Review
+    # Relationship with Review
+    reviews = db.relationship('Review', back_populates='customer')
 
     def __repr__(self):
         return f'<Customer {self.id}, {self.name}>'
 
+# Define the Item model
 class Item(db.Model):
     __tablename__ = 'items'
 
@@ -27,11 +32,13 @@ class Item(db.Model):
     name = db.Column(db.String)
     price = db.Column(db.Float)
 
-    reviews = db.relationship('Review', back_populates='item')  # Relationship with Review
+    # Relationship with Review
+    reviews = db.relationship('Review', back_populates='item')
 
     def __repr__(self):
         return f'<Item {self.id}, {self.name}, {self.price}>'
 
+# Define the Review model
 class Review(db.Model):
     __tablename__ = 'reviews'
 
@@ -40,12 +47,14 @@ class Review(db.Model):
     customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
 
+    # Relationships with Customer and Item
     customer = db.relationship('Customer', back_populates='reviews')
     item = db.relationship('Item', back_populates='reviews')
 
     def __repr__(self):
         return f'<Review {self.id}, {self.comment}, Customer {self.customer_id}, Item {self.item_id}>'
 
+# Define the Message model with serialization support
 class Message(db.Model, SerializerMixin):
     __tablename__ = 'messages'
 

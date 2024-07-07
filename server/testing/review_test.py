@@ -1,27 +1,21 @@
-import pytest
+import pytest # type: ignore
 from app import create_app
 from models import db, Customer, Item, Review
 
 @pytest.fixture(scope='module')
 def test_client():
     flask_app = create_app()
-
-    # Flask provides a way to test your application by exposing the Werkzeug test Client
-    # and handling the context locals for you.
     testing_client = flask_app.test_client()
-
-    # Establish an application context before running the tests.
     ctx = flask_app.app_context()
     ctx.push()
 
-    yield testing_client  # this is where the testing happens!
+    yield testing_client
 
     ctx.pop()
 
 @pytest.fixture(scope='module')
 def init_database(test_client):
     with test_client.application.app_context():
-        # Create the database and the database table
         db.create_all()
 
         # Insert customer data
@@ -32,10 +26,9 @@ def init_database(test_client):
         item1 = Item(name='Sample Item', price=19.99)
         db.session.add(item1)
 
-        # Commit the changes for the customer and item
         db.session.commit()
 
-        yield db  # this is where the testing happens!
+        yield db
 
         db.drop_all()
 
@@ -60,7 +53,6 @@ def test_can_be_saved_to_database(test_client, init_database):
         db.session.add(r)
         db.session.commit()
 
-        # Add debugging information
         saved_review = db.session.query(Review).filter_by(id=r.id).first()
         assert saved_review, f"Review with id {r.id} was not found in the database."
         assert saved_review.comment == 'great!', f"Expected comment 'great!' but got '{saved_review.comment}'"
@@ -78,10 +70,8 @@ def test_is_related_to_customer_and_item(test_client, init_database):
         db.session.add(r)
         db.session.commit()
 
-        # check foreign keys
         assert r.customer_id == c.id
         assert r.item_id == i.id
-        # check relationships
         assert r.customer == c
         assert r.item == i
         assert r in c.reviews
